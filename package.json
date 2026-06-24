@@ -9,8 +9,8 @@
     "lint": "next lint",
     "deploy:worker": "wrangler deploy",
     "deploy:pages": "wrangler pages deploy .next --project-name property-portal-2",
-    "db:migrate": "wrangler d1 migrations apply property_db --remote",
-    "db:migrate:local": "wrangler d1 migrations apply property_db --local",
+    "db:migrate": "wrangler d1 migrations apply property-portal-2-db --remote",
+    "db:migrate:local": "wrangler d1 migrations apply property-portal-2-db --local",
     "typecheck:worker": "tsc --project tsconfig.worker.json",
     "typecheck": "tsc --noEmit"
   },

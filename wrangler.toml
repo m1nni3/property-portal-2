@@ -2,8 +2,6 @@ name = "property-portal-2"
 main = "src/index.ts"
 compatibility_date = "2026-03-01"
 
-# Cron triggers (matches schedule switch in src/scheduled.ts)
-
 # Secrets are stored in .dev.vars locally and via `wrangler secret put` in production.
 # Do NOT put real tokens here.
 [vars]
@@ -17,33 +15,17 @@ crons = [
   "0 1 1 * *",   # 1st of month    — journal batch
 ]
 
-# Cloudflare Pages environment variables if deploying to Pages
-# [site]
-# bucket = "./public"
-
-# Development mode routes, etc.
 [dev]
 port = 8787
-
-# Production environment configuration
-[production]
-# routes = [{ pattern = "example.com/api/*", zone_name = "example.com" }] # Example route
 
 # D1 Database binding
 [[d1_databases]]
 binding = "DB"
-database_name = "property_db"
-database_id = "364a59cc-c784-4d2d-9b1c-5e464fbf292c"
+database_name = "property-portal-2-db"
+database_id = "deba0b10-9126-4ac0-bc6c-7982dfb8ca9d"
+migrations_dir = "d1/migrations"
 
 # R2 Bucket binding
 [[r2_buckets]]
 binding = "R2"
-bucket_name = "property-files" # Bucket name for storing files
-
-# KV Namespace binding (optional for caching)
-# [[kv_namespaces]]
-# binding = "CACHE"
-# preview_id = "YOUR_KV_PREVIEW_ID"
-# account_id = "YOUR_CF_ACCOUNT"
-
-pages_build_output_dir = ".next"
+bucket_name = "property-files"
