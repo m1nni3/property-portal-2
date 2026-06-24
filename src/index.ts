@@ -1,93 +1,169 @@
 /**
- * property-portal-worker — main entry point
- *
- * Routes:
- *   /api/properties       → CRUD for properties
- *   /api/invoices         → CRUD for invoices
- *   /api/maintenance      → CRUD for maintenance tasks
- *   /api/vendors          → list vendor contacts
- *
- * Scheduled cron jobs are handled by the `scheduled` export.
+ * property-portal-2 — Cloudflare Worker entry point
  */
 
 import { Router } from 'itty-router';
-import { Env } from './db';
+import { Env, getDb,
+  fetchProperties, fetchPropertyById, createProperty, updateProperty, deleteProperty,
+  fetchInvoices, fetchInvoiceById, createInvoice, updateInvoice, deleteInvoice,
+  fetchMaintenanceTasks, fetchMaintenanceTaskById, createMaintenanceTask, updateMaintenanceTask, deleteMaintenanceTask,
+  fetchVendors,
+} from './db';
 import { scheduled } from './scheduled';
 
-// --- Sub-routers (each file exports a `handler` with its own Router) ---
-import { handler as propertiesHandler } from './api/properties';
-import { handler as invoicesHandler } from './api/invoices';
-import { handler as maintenanceHandler } from './api/maintenance';
-
-// ── CORS helpers ──────────────────────────────────────────────────────────────
+// ── CORS ──────────────────────────────────────────────────────────────────────
 const CORS_HEADERS: Record<string, string> = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
-function withCors(response: Response): Response {
-  const res = new Response(response.body, response);
-  Object.entries(CORS_HEADERS).forEach(([k, v]) => res.headers.set(k, v));
-  return res;
+function json(data: unknown, status = 200): Response {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
+  });
 }
 
-// ── Health check ──────────────────────────────────────────────────────────────
+function err(message: string, status = 500): Response {
+  return json({ error: message }, status);
+}
+
+// ── Router ────────────────────────────────────────────────────────────────────
 const router = Router();
 
-router.get('/api/health', () =>
-  new Response(JSON.stringify({ status: 'ok', ts: new Date().toISOString() }), {
-    headers: { 'Content-Type': 'application/json' },
-  })
-);
+// Health
+router.get('/api/health', () => json({ status: 'ok', ts: new Date().toISOString() }));
 
-// ── Delegate to sub-routers ───────────────────────────────────────────────────
-// Properties
-router.get('/api/properties', (req, env) => propertiesHandler.fetch(req as Request, env, {} as ExecutionContext));
-router.get('/api/properties/:id', (req, env) => propertiesHandler.fetch(req as Request, env, {} as ExecutionContext));
-router.post('/api/properties', (req, env) => propertiesHandler.fetch(req as Request, env, {} as ExecutionContext));
-router.put('/api/properties/:id', (req, env) => propertiesHandler.fetch(req as Request, env, {} as ExecutionContext));
-router.delete('/api/properties/:id', (req, env) => propertiesHandler.fetch(req as Request, env, {} as ExecutionContext));
+// ── Properties ────────────────────────────────────────────────────────────────
+router.get('/api/properties', async (req: any, env: Env) => {
+  try {
+    return json(await fetchProperties(getDb(env)));
+  } catch (e: any) { return err(e.message); }
+});
 
-// Invoices
-router.get('/api/invoices', (req, env) => invoicesHandler.fetch(req as Request, env, {} as ExecutionContext));
-router.get('/api/invoices/:id', (req, env) => invoicesHandler.fetch(req as Request, env, {} as ExecutionContext));
-router.post('/api/invoices', (req, env) => invoicesHandler.fetch(req as Request, env, {} as ExecutionContext));
-router.put('/api/invoices/:id', (req, env) => invoicesHandler.fetch(req as Request, env, {} as ExecutionContext));
-router.delete('/api/invoices/:id', (req, env) => invoicesHandler.fetch(req as Request, env, {} as ExecutionContext));
+router.get('/api/properties/:id', async (req: any, env: Env) => {
+  try {
+    const item = await fetchPropertyById(getDb(env), req.params.id);
+    return item ? json(item) : err('Not found', 404);
+  } catch (e: any) { return err(e.message); }
+});
 
-// Maintenance
-router.get('/api/maintenance', (req, env) => maintenanceHandler.fetch(req as Request, env, {} as ExecutionContext));
-router.get('/api/maintenance/:id', (req, env) => maintenanceHandler.fetch(req as Request, env, {} as ExecutionContext));
-router.post('/api/maintenance', (req, env) => maintenanceHandler.fetch(req as Request, env, {} as ExecutionContext));
-router.put('/api/maintenance/:id', (req, env) => maintenanceHandler.fetch(req as Request, env, {} as ExecutionContext));
-router.delete('/api/maintenance/:id', (req, env) => maintenanceHandler.fetch(req as Request, env, {} as ExecutionContext));
+router.post('/api/properties', async (req: any, env: Env) => {
+  try {
+    const body = await req.json();
+    if (!body.name?.trim()) return err('name is required', 400);
+    return json(await createProperty(getDb(env), { name: body.name.trim(), address: body.address ?? null }), 201);
+  } catch (e: any) { return err(e.message); }
+});
 
-// Vendors (read-only for now)
-router.get('/api/vendors', (req, env) => propertiesHandler.fetch(req as Request, env, {} as ExecutionContext));
+router.put('/api/properties/:id', async (req: any, env: Env) => {
+  try {
+    const body = await req.json();
+    await updateProperty(getDb(env), req.params.id, body);
+    return json(await fetchPropertyById(getDb(env), req.params.id));
+  } catch (e: any) { return err(e.message); }
+});
+
+router.delete('/api/properties/:id', async (req: any, env: Env) => {
+  try {
+    await deleteProperty(getDb(env), req.params.id);
+    return new Response(null, { status: 204, headers: CORS_HEADERS });
+  } catch (e: any) { return err(e.message); }
+});
+
+// ── Invoices ──────────────────────────────────────────────────────────────────
+router.get('/api/invoices', async (req: any, env: Env) => {
+  try {
+    return json(await fetchInvoices(getDb(env)));
+  } catch (e: any) { return err(e.message); }
+});
+
+router.get('/api/invoices/:id', async (req: any, env: Env) => {
+  try {
+    const item = await fetchInvoiceById(getDb(env), req.params.id);
+    return item ? json(item) : err('Not found', 404);
+  } catch (e: any) { return err(e.message); }
+});
+
+router.post('/api/invoices', async (req: any, env: Env) => {
+  try {
+    const body = await req.json();
+    if (!body.property_id || !body.vendor_id || !body.amount || !body.due_date)
+      return err('Missing required fields: property_id, vendor_id, amount, due_date', 400);
+    return json(await createInvoice(getDb(env), body), 201);
+  } catch (e: any) { return err(e.message); }
+});
+
+router.put('/api/invoices/:id', async (req: any, env: Env) => {
+  try {
+    const body = await req.json();
+    await updateInvoice(getDb(env), req.params.id, body);
+    return json(await fetchInvoiceById(getDb(env), req.params.id));
+  } catch (e: any) { return err(e.message); }
+});
+
+router.delete('/api/invoices/:id', async (req: any, env: Env) => {
+  try {
+    await deleteInvoice(getDb(env), req.params.id);
+    return new Response(null, { status: 204, headers: CORS_HEADERS });
+  } catch (e: any) { return err(e.message); }
+});
+
+// ── Maintenance ───────────────────────────────────────────────────────────────
+router.get('/api/maintenance', async (req: any, env: Env) => {
+  try {
+    return json(await fetchMaintenanceTasks(getDb(env)));
+  } catch (e: any) { return err(e.message); }
+});
+
+router.get('/api/maintenance/:id', async (req: any, env: Env) => {
+  try {
+    const item = await fetchMaintenanceTaskById(getDb(env), req.params.id);
+    return item ? json(item) : err('Not found', 404);
+  } catch (e: any) { return err(e.message); }
+});
+
+router.post('/api/maintenance', async (req: any, env: Env) => {
+  try {
+    const body = await req.json();
+    if (!body.property_id || !body.description) return err('Missing required fields', 400);
+    return json(await createMaintenanceTask(getDb(env), body), 201);
+  } catch (e: any) { return err(e.message); }
+});
+
+router.put('/api/maintenance/:id', async (req: any, env: Env) => {
+  try {
+    const body = await req.json();
+    await updateMaintenanceTask(getDb(env), req.params.id, body);
+    return json(await fetchMaintenanceTaskById(getDb(env), req.params.id));
+  } catch (e: any) { return err(e.message); }
+});
+
+router.delete('/api/maintenance/:id', async (req: any, env: Env) => {
+  try {
+    await deleteMaintenanceTask(getDb(env), req.params.id);
+    return new Response(null, { status: 204, headers: CORS_HEADERS });
+  } catch (e: any) { return err(e.message); }
+});
+
+// ── Vendors ───────────────────────────────────────────────────────────────────
+router.get('/api/vendors', async (req: any, env: Env) => {
+  try {
+    return json(await fetchVendors(getDb(env)));
+  } catch (e: any) { return err(e.message); }
+});
 
 // ── Catch-all ─────────────────────────────────────────────────────────────────
-router.all('*', () => new Response('Not Found', { status: 404 }));
+router.all('*', () => err('Not found', 404));
 
 // ── Worker export ─────────────────────────────────────────────────────────────
 export default {
-  /**
-   * Handle inbound HTTP requests.
-   * Preflight OPTIONS requests are answered immediately with CORS headers.
-   */
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-    // Handle CORS preflight
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: CORS_HEADERS });
     }
-
-    const response = await router.handle(request, env, ctx);
-    return withCors(response ?? new Response('Not Found', { status: 404 }));
+    return router.fetch(request, env, ctx);
   },
-
-  /**
-   * Handle Cloudflare cron triggers.
-   * Configure triggers in wrangler.toml under [[triggers.crons]].
-   */
   scheduled,
 };
