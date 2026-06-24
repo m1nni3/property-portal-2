@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const WORKER_URL = process.env.WORKER_API_URL || 'http://localhost:8787';

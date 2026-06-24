@@ -15,14 +15,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: npm
-
-      - run: npm ci
-
+      - run: npm ci --legacy-peer-deps
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@v3
         with:
@@ -35,22 +32,18 @@ jobs:
     needs: deploy-worker
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: npm
-
-      - run: npm ci
-
-      - name: Build Next.js
-        run: npm run build
+      - run: npm ci --legacy-peer-deps
+      - name: Build with next-on-pages
+        run: npx @cloudflare/next-on-pages
         env:
           WORKER_API_URL: ${{ secrets.WORKER_API_URL }}
-
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          command: pages deploy .next --project-name=property-portal-2-pages --commit-dirty=true
+          command: pages deploy .vercel/output/static --project-name=property-portal-2-pages --commit-dirty=true
