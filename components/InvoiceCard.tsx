@@ -1,5 +1,6 @@
 import React from 'react';
-import { Invoice } from '../src/types'
+import { useRouter } from 'next/router';
+import { Invoice } from '../src/types';
 
 interface InvoiceCardProps {
   invoice: Invoice;
@@ -8,6 +9,7 @@ interface InvoiceCardProps {
 }
 
 const InvoiceCard: React.FC<InvoiceCardProps> = ({ invoice, onViewDetails, onEdit }) => {
+  const router = useRouter();
   const formattedDueDate = new Date(invoice.due_date).toLocaleDateString();
   const statusColorClass = {
     pending: 'bg-yellow-200 text-yellow-800',
@@ -57,13 +59,13 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({ invoice, onViewDetails, onEdi
       </div>
       <div className="mt-4 flex space-x-2 pt-3 border-t border-gray-200">
         <button
-          onClick={() => window.location.href = `/invoices/${invoice.id}`}
+          onClick={() => router.push(`/invoices/${invoice.id}`)}
           className="px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
         >
           View
         </button>
         <button
-          onClick={() => window.location.href = `/invoices/${invoice.id}/edit`}
+          onClick={() => router.push(`/invoices/${invoice.id}/edit`)}
           className="px-3 py-1 bg-gray-200 text-gray-700 text-xs rounded hover:bg-gray-300 transition-colors"
         >
           Edit

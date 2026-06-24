@@ -2,7 +2,7 @@ import { Env, getDb } from './db';
 
 async function markOverdueInvoices(db: D1Database) {
   await db.prepare(`
-    UPDATE invoices
+    UPDATE invoice
     SET status = 'overdue'
     WHERE status = 'pending'
       AND date(due_date) < date('now')
@@ -12,7 +12,7 @@ async function markOverdueInvoices(db: D1Database) {
 async function findUpcomingInvoices(db: D1Database) {
   return db.prepare(`
     SELECT *
-    FROM invoices
+    FROM invoice
     WHERE status = 'pending'
       AND date(due_date) BETWEEN date('now') AND date('now', '+7 day')
   `).all();
@@ -21,7 +21,7 @@ async function findUpcomingInvoices(db: D1Database) {
 async function findMissingDocuments(db: D1Database) {
   return db.prepare(`
     SELECT *
-    FROM invoices
+    FROM invoice
     WHERE doc_url IS NULL OR doc_url = ''
   `).all();
 }
@@ -29,7 +29,7 @@ async function findMissingDocuments(db: D1Database) {
 async function generateInvoiceJournalEntries(db: D1Database) {
   return db.prepare(`
     SELECT *
-    FROM invoices
+    FROM invoice
     WHERE status = 'paid'
       AND date(created_at) >= date('now', '-30 day')
   `).all();
