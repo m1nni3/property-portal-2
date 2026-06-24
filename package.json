@@ -18,9 +18,9 @@
   "dependencies": {
     "@cloudflare/workers-types": "^4.20240613.0",
     "itty-router": "~6.0.0",
-    "next": "^14.2.29",
-    "react": "^18",
-    "react-dom": "^18",
+    "next": "^15.5.2",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "wrangler": "^3.65.0"
   },
   "devDependencies": {
