@@ -30,3 +30,5 @@ bucket_name = "property-files" # Bucket name for storing files
 # binding = "CACHE"
 # preview_id = "YOUR_KV_PREVIEW_ID"
 # account_id = "YOUR_CF_ACCOUNT"
+
+pages_build_output_dir = ".vercel/output/static"
