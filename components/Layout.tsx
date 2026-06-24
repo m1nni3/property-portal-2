@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import Link from 'next/link';
 import { ReactNode } from 'react';
 
 interface LayoutProps {
@@ -18,10 +19,10 @@ const Layout = ({ children, title = 'Property Platform' }: LayoutProps) => {
         <h1 className="text-2xl font-bold">Property Management</h1>
         <nav className="mt-2">
           <ul className="flex space-x-4">
-            <li><a href="/" className="hover:underline">Home</a></li>
-            <li><a href="/dashboard" className="hover:underline">Dashboard</a></li>
-            <li><a href="/properties" className="hover:underline">Properties</a></li>
-            {/* Add other navigation links here */}
+            <li><Link href="/" className="hover:underline">Home</Link></li>
+            <li><Link href="/dashboard" className="hover:underline">Dashboard</Link></li>
+            <li><Link href="/properties" className="hover:underline">Properties</Link></li>
+            <li><Link href="/invoices" className="hover:underline">Invoices</Link></li>
           </ul>
         </nav>
       </header>
@@ -29,7 +30,7 @@ const Layout = ({ children, title = 'Property Platform' }: LayoutProps) => {
         {children}
       </main>
       <footer className="bg-gray-800 text-white p-4 mt-8 text-center">
-        <p>&copy; {new Date().getFullYear()} Property Management Inc. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Property Management. All rights reserved.</p>
       </footer>
     </div>
   );

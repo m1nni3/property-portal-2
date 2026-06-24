@@ -4,8 +4,11 @@ compatibility_date = "2026-03-01"
 
 # Cron triggers (matches schedule switch in src/scheduled.ts)
 
+# Secrets are stored in .dev.vars locally and via `wrangler secret put` in production.
+# Do NOT put real tokens here.
 [vars]
-CF_API_TOKEN = "cfoat_gVGIJMM2MZ5tmZhPaN-lQ-x_bjrp0gyuDpmxOdLqxEs.RoGAz6ivfqCF-2RCjB3knGLyMBM_APZvHMBczmPH7nY"
+# Add non-sensitive vars here, e.g.: APP_ENV = "production"
+
 [triggers]
 crons = [
   "0 0 * * *",   # daily midnight  — mark overdue invoices
@@ -43,4 +46,4 @@ bucket_name = "property-files" # Bucket name for storing files
 # preview_id = "YOUR_KV_PREVIEW_ID"
 # account_id = "YOUR_CF_ACCOUNT"
 
-pages_build_output_dir = ".vercel/output/static"
+pages_build_output_dir = ".next"
