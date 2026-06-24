@@ -22,8 +22,10 @@ export interface Invoice {
   currency: string;
   due_date: string;
   status: 'pending' | 'paid' | 'overdue' | 'cancelled';
+  description: string | null;
   doc_url: string | null;
   created_at: string;
+  updated_at: string | null;
 }
 
 export interface MaintenanceTask {
