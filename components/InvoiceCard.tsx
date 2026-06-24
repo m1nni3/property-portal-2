@@ -1,5 +1,5 @@
 import React from 'react';
-import { Invoice } from '../workers/src/types'; // Assuming types are shared or accessible
+import { Invoice } from '../types/invoice'// Assuming types are shared or accessible
 
 interface InvoiceCardProps {
   invoice: Invoice;
