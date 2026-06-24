@@ -38,7 +38,7 @@ router.post('/api/maintenance', async (request: Request, env: Env) => {
     };
     
     const createdTask = await createMaintenanceTask(db, newTaskData);
-    return new Response(JSON.JSON.stringify(createdTask), {
+    return new Response(JSON.stringify(createdTask), {
       status: 201,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -75,7 +75,7 @@ router.put('/api/maintenance/:id', async (request: Request, env: Env) => {
         await updateMaintenanceTask(db, id as string, body);
         
         const updatedTask = await fetchMaintenanceTaskById(db, id as string);
-        return new Response(JSON.JSON.stringify(updatedTask), {
+        return new Response(JSON.stringify(updatedTask), {
             headers: { 'Content-Type': 'application/json' },
         });
     } catch (error: any) {

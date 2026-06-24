@@ -1,6 +1,15 @@
 name = "property-portal-worker"
-main = "src/index.ts" # Or your main worker file
+main = "src/index.ts"
 compatibility_date = "2026-03-01"
+
+# Cron triggers (matches schedule switch in src/scheduled.ts)
+[triggers]
+crons = [
+  "0 0 * * *",   # daily midnight  — mark overdue invoices
+  "0 6 * * *",   # daily 06:00     — upcoming invoice alerts
+  "0 7 * * *",   # daily 07:00     — missing document check
+  "0 1 1 * *",   # 1st of month    — journal batch
+]
 
 # Cloudflare Pages environment variables if deploying to Pages
 # [site]
