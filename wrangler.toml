@@ -27,7 +27,7 @@ port = 8787
 [[d1_databases]]
 binding = "DB"
 database_name = "property_db"
-# database_id = "YOUR_D1_ID" # You'll get this after creating the D1 DB
+database_id = "364a59cc-c784-4d2d-9b1c-5e464fbf292c"
 
 # R2 Bucket binding
 [[r2_buckets]]
