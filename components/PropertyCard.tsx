@@ -1,5 +1,5 @@
 import React from 'react';
-import { Property } from '../types'; // Assuming types are shared or accessible
+import { Property } from '../src/types';
 
 interface PropertyCardProps {
   property: Property;

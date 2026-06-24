@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../../../components/Layout';
-import { Invoice } from '../../../types';
+import { Invoice } from '../../../src/types';
 
 const InvoiceDetailPage = () => {
   const router = useRouter();
@@ -18,10 +18,10 @@ const InvoiceDetailPage = () => {
       try {
         const response = await fetch(`/api/invoices/${id}`);
         if (!response.ok) {
-          const errData = await response.json();
+          const errData = await response.json() as any;
           throw new Error(errData.error || `HTTP ${response.status}`);
         }
-        const data = await response.json<Invoice>();
+        const data = await response.json() as Invoice;
         setInvoice(data);
       } catch (err: any) {
         setError(err.message || 'Failed to load invoice');

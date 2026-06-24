@@ -1,13 +1,13 @@
 import { Router, Route } from 'itty-router';
-import { Env, getDb, fetchProperties, createProperty, fetchPropertyById, updateProperty, deleteProperty } from '../db'; // Import all necessary functions
-import { Property } from '../types';
+import { Env, getDb, fetchProperties, createProperty, fetchPropertyById, updateProperty, deleteProperty, fetchInvoices, fetchInvoiceById, createInvoice, updateInvoice, deleteInvoice, fetchMaintenanceTasks, createMaintenanceTask, fetchMaintenanceTaskById, updateMaintenanceTask, deleteMaintenanceTask, fetchVendors } from '../db';
+import { Property, Invoice, MaintenanceTask } from '../types';
 
 const router = Router();
 
 // --- Property Routes ---
 
 // GET /api/properties - Fetch all properties
-router.get('/api/properties', async (request: Request, env: Env) => {
+router.get('/api/properties', async (request: any, env: Env) => {
   try {
     const db = getDb(env);
     const properties = await fetchProperties(db);
@@ -21,7 +21,7 @@ router.get('/api/properties', async (request: Request, env: Env) => {
 });
 
 // GET /api/properties/:id - Fetch a single property by ID
-router.get('/api/properties/:id', async (request: Request, env: Env) => {
+router.get('/api/properties/:id', async (request: any, env: Env) => {
   const { id } = request.params;
   try {
     const db = getDb(env);
@@ -39,10 +39,10 @@ router.get('/api/properties/:id', async (request: Request, env: Env) => {
 });
 
 // POST /api/properties - Create a new property
-router.post('/api/properties', async (request: Request, env: Env) => {
+router.post('/api/properties', async (request: any, env: Env) => {
   const db = getDb(env);
   try {
-    const body = await request.json<{ name: string; address?: string | null }>();
+    const body = await request.json() as { name: string; address?: string | null };
     if (!body.name || body.name.trim() === '') {
       return new Response(JSON.stringify({ error: 'Property name is required' }), { status: 400 });
     }
@@ -62,11 +62,11 @@ router.post('/api/properties', async (request: Request, env: Env) => {
 });
 
 // PUT /api/properties/:id - Update an existing property
-router.put('/api/properties/:id', async (request: Request, env: Env) => {
+router.put('/api/properties/:id', async (request: any, env: Env) => {
   const { id } = request.params;
   const db = getDb(env);
   try {
-    const body = await request.json<Partial<Omit<Property, 'id' | 'created_at'>>>();
+    const body = await request.json() as Partial<Omit<Property, 'id' | 'created_at'>>;
     // Basic validation for update (e.g., if name is provided, it shouldn't be empty)
     if (body.name !== undefined && body.name.trim() === '') {
         return new Response(JSON.stringify({ error: 'Property name cannot be empty' }), { status: 400 });
@@ -86,7 +86,7 @@ router.put('/api/properties/:id', async (request: Request, env: Env) => {
 });
 
 // DELETE /api/properties/:id - Delete a property
-router.delete('/api/properties/:id', async (request: Request, env: Env) => {
+router.delete('/api/properties/:id', async (request: any, env: Env) => {
   const { id } = request.params;
   const db = getDb(env);
   try {
@@ -107,7 +107,7 @@ router.delete('/api/properties/:id', async (request: Request, env: Env) => {
 // POST /api/invoices (Already implemented in previous steps)
 
 // GET /api/invoices/:id - Fetch a single invoice by ID
-router.get('/api/invoices/:id', async (request: Request, env: Env) => {
+router.get('/api/invoices/:id', async (request: any, env: Env) => {
   const { id } = request.params;
   try {
     const db = getDb(env);
@@ -125,11 +125,11 @@ router.get('/api/invoices/:id', async (request: Request, env: Env) => {
 });
 
 // PUT /api/invoices/:id - Update an existing invoice
-router.put('/api/invoices/:id', async (request: Request, env: Env) => {
+router.put('/api/invoices/:id', async (request: any, env: Env) => {
   const { id } = request.params;
   const db = getDb(env);
   try {
-    const body = await request.json<Partial<Omit<Invoice, 'id' | 'created_at'>>>();
+    const body = await request.json() as Partial<Omit<Invoice, 'id' | 'created_at'>>;
     // Add validation for fields if needed
     await updateInvoice(db, id as string, body);
     
@@ -144,7 +144,7 @@ router.put('/api/invoices/:id', async (request: Request, env: Env) => {
 });
 
 // DELETE /api/invoices/:id - Delete an invoice
-router.delete('/api/invoices/:id', async (request: Request, env: Env) => {
+router.delete('/api/invoices/:id', async (request: any, env: Env) => {
   const { id } = request.params;
   const db = getDb(env);
   try {
@@ -164,7 +164,7 @@ router.delete('/api/invoices/:id', async (request: Request, env: Env) => {
 // POST /api/maintenance (Already implemented in previous steps)
 
 // GET /api/maintenance/:id - Fetch a single maintenance task by ID
-router.get('/api/maintenance/:id', async (request: Request, env: Env) => {
+router.get('/api/maintenance/:id', async (request: any, env: Env) => {
     const { id } = request.params;
     try {
         const db = getDb(env);
@@ -182,11 +182,11 @@ router.get('/api/maintenance/:id', async (request: Request, env: Env) => {
 });
 
 // PUT /api/maintenance/:id - Update an existing maintenance task
-router.put('/api/maintenance/:id', async (request: Request, env: Env) => {
+router.put('/api/maintenance/:id', async (request: any, env: Env) => {
     const { id } = request.params;
     const db = getDb(env);
     try {
-        const body = await request.json<Partial<Omit<MaintenanceTask, 'id' | 'created_at'>>>();
+        const body = await request.json() as Partial<Omit<MaintenanceTask, 'id' | 'created_at'>>;
         await updateMaintenanceTask(db, id as string, body);
         
         const updatedTask = await fetchMaintenanceTaskById(db, id as string);
@@ -200,7 +200,7 @@ router.put('/api/maintenance/:id', async (request: Request, env: Env) => {
 });
 
 // DELETE /api/maintenance/:id - Delete a maintenance task
-router.delete('/api/maintenance/:id', async (request: Request, env: Env) => {
+router.delete('/api/maintenance/:id', async (request: any, env: Env) => {
     const { id } = request.params;
     const db = getDb(env);
     try {
@@ -215,7 +215,7 @@ router.delete('/api/maintenance/:id', async (request: Request, env: Env) => {
 // --- Vendor Routes ---
 // Implement similar routes for vendors if needed, using fetchVendors from db.ts
 // Example: GET /api/vendors
-router.get('/api/vendors', async (request: Request, env: Env) => {
+router.get('/api/vendors', async (request: any, env: Env) => {
     try {
         const db = getDb(env);
         const vendors = await fetchVendors(db);

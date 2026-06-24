@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import Layout from '../../components/Layout';
-import PropertyForm from '../../components/PropertyForm';
+import Layout from '../../../components/Layout';
+import PropertyForm from '../../../components/PropertyForm';
 import { useRouter } from 'next/router';
-import { Property } from '../../types'; // Assuming types are accessible
+import { Property } from '../../../src/types';
 
 const EditPropertyPage = () => {
   const router = useRouter();
@@ -23,7 +23,7 @@ const EditPropertyPage = () => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json<Property>();
+        const data = await response.json() as Property;
         setProperty(data);
       } catch (err: any) {
         setError(err.message || 'Failed to fetch property details');
@@ -52,7 +52,7 @@ const EditPropertyPage = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json<{ error: string }>();
+        const errorData = await response.json() as { error: string };
         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 

@@ -1,5 +1,5 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
-import { Property } from '../types'; // Assuming types are accessible
+import { Property } from '../src/types';
 
 interface PropertyFormProps {
   initialData?: Partial<Property>; // For editing, not used now but good practice

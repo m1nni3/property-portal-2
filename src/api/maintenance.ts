@@ -5,7 +5,7 @@ import { MaintenanceTask } from '../types';
 const router = Router();
 
 // GET /api/maintenance - Fetch all maintenance tasks from D1
-router.get('/api/maintenance', async (request: Request, env: Env) => {
+router.get('/api/maintenance', async (request: any, env: Env) => {
   try {
     const db = getDb(env);
     const tasks = await fetchMaintenanceTasks(db);
@@ -19,10 +19,10 @@ router.get('/api/maintenance', async (request: Request, env: Env) => {
 });
 
 // POST /api/maintenance - Create a new maintenance task in D1
-router.post('/api/maintenance', async (request: Request, env: Env) => {
+router.post('/api/maintenance', async (request: any, env: Env) => {
   const db = getDb(env);
   try {
-    const body = await request.json<any>();
+    const body = await request.json() as any;
 
     if (!body.property_id || !body.description) {
       return new Response(JSON.stringify({ error: 'Missing required fields: property_id, description' }), { status: 400 });
@@ -49,7 +49,7 @@ router.post('/api/maintenance', async (request: Request, env: Env) => {
 });
 
 // GET /api/maintenance/:id - Fetch a single maintenance task by ID
-router.get('/api/maintenance/:id', async (request: Request, env: Env) => {
+router.get('/api/maintenance/:id', async (request: any, env: Env) => {
     const { id } = request.params;
     try {
         const db = getDb(env);
@@ -67,11 +67,11 @@ router.get('/api/maintenance/:id', async (request: Request, env: Env) => {
 });
 
 // PUT /api/maintenance/:id - Update an existing maintenance task
-router.put('/api/maintenance/:id', async (request: Request, env: Env) => {
+router.put('/api/maintenance/:id', async (request: any, env: Env) => {
     const { id } = request.params;
     const db = getDb(env);
     try {
-        const body = await request.json<Partial<Omit<MaintenanceTask, 'id' | 'created_at'>>>();
+        const body = await request.json() as Partial<Omit<MaintenanceTask, 'id' | 'created_at'>>;
         await updateMaintenanceTask(db, id as string, body);
         
         const updatedTask = await fetchMaintenanceTaskById(db, id as string);
@@ -85,7 +85,7 @@ router.put('/api/maintenance/:id', async (request: Request, env: Env) => {
 });
 
 // DELETE /api/maintenance/:id - Delete a maintenance task
-router.delete('/api/maintenance/:id', async (request: Request, env: Env) => {
+router.delete('/api/maintenance/:id', async (request: any, env: Env) => {
     const { id } = request.params;
     const db = getDb(env);
     try {

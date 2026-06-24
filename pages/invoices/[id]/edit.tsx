@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Layout from '../../../components/Layout';
 import InvoiceForm from '../../../components/InvoiceForm';
 import { useRouter } from 'next/router';
-import { Invoice } from '../../../types';
+import { Invoice } from '../../../src/types';
 
 const EditInvoicePage = () => {
   const router = useRouter();
@@ -18,10 +18,10 @@ const EditInvoicePage = () => {
       try {
         const response = await fetch(`/api/invoices/${id}`);
         if (!response.ok) {
-          const err = await response.json();
+          const err = await response.json() as any;
           throw new Error(err.error || `HTTP ${response.status}`);
         }
-        const data = await response.json<Invoice>();
+        const data = await response.json() as Invoice;
         setInvoice(data);
       } catch (err: any) {
         setError(err.message || 'Failed to load invoice');
@@ -49,7 +49,7 @@ const EditInvoicePage = () => {
         }
       );
       if (!response.ok) {
-        const errData = await response.json<{ error: string }>();
+        const errData = await response.json() as any;
         throw new Error(errData.error || `HTTP ${response.status}`);
       }
       // On success, go back to invoices list or detail page

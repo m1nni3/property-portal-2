@@ -1,8 +1,8 @@
 import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
-import Layout from '../components/Layout';
-import InvoiceForm from '../components/InvoiceForm'; // Correct path based on structure
+import Layout from '../../components/Layout';
+import InvoiceForm from '../../components/InvoiceForm';
 import { useRouter } from 'next/router';
-import { Invoice } from '../types'; // Assuming types are accessible
+import { Invoice } from '../../src/types';
 
 const NewInvoicePage = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -22,7 +22,7 @@ const NewInvoicePage = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json<{ error: string }>();
+        const errorData = await response.json() as { error: string };
         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 

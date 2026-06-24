@@ -7,13 +7,9 @@ const NOTION_VERSION = "2022-06-28"; // Stable version
 
 // Helper to get the API key (reads from your secure location)
 async function getToken(): Promise<string> {
-  try {
-    // Workers can access secrets directly; local dev uses your file
-    const key = Deno.readTextFileSync(`${process.env.HOME}/.easyclaw/linkapp/notion_api_key`).trim();
-    return key;
-  } catch {
-    throw new Error("Notion API key not found. Set NOTION_API_KEY env var.");
-  }
+  const key = process.env.NOTION_API_KEY;
+  if (!key) throw new Error("Notion API key not found. Set NOTION_API_KEY env var.");
+  return key;
 }
 
 // Convert your internal Invoice object to Notion properties
@@ -35,14 +31,14 @@ function toNotionProps(invoice: any) {
 function fromNotion(page: any) {
   return {
     id: page.id,
-    property_id: String(page.properties[\"Property ID\"]?.number || ""),
-    vendor_id: String(page.properties[\"Vendor ID\"]?.number || ""),
+    property_id: String(page.properties['Property ID']?.number || ''),
+    vendor_id: String(page.properties['Vendor ID']?.number || ''),
     amount: page.properties.Amount?.number || 0,
-    currency: page.properties.Currency?.select?.name || "USD",
-    due_date: page.properties[\"Due Date\"]?.date?.start || "",
-    status: page.properties.Status?.select?.name || "pending",
+    currency: page.properties.Currency?.select?.name || 'USD',
+    due_date: page.properties['Due Date']?.date?.start || '',
+    status: page.properties.Status?.select?.name || 'pending',
     description: page.properties.Description?.rich_text?.[0]?.plain_text || null,
-    doc_url: page.properties[\"Document URL\"]?.url || null,
+    doc_url: page.properties['Document URL']?.url || null,
     created_at: page.created_time,
     updated_at: page.last_edited_time,
   };

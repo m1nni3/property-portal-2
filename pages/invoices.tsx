@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import InvoiceCard from '../components/InvoiceCard';
-import { Invoice } from '../types'; // Assuming types are shared or accessible
+import { Invoice } from '../src/types';
 
 const InvoicesPage = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -18,7 +18,7 @@ const InvoicesPage = () => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json<Invoice[]>();
+        const data = await response.json() as Invoice[];
         setInvoices(data);
       } catch (err: any) {
         setError(err.message || 'Failed to fetch invoices');

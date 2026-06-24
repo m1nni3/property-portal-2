@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../../../components/Layout';
-import { Property } from '../../../types';
+import { Property } from '../../../src/types';
 
 const PropertyDetailPage = () => {
   const router = useRouter();
@@ -18,10 +18,10 @@ const PropertyDetailPage = () => {
       try {
         const response = await fetch(`/api/properties/${id}`);
         if (!response.ok) {
-          const errData = await response.json();
+          const errData = await response.json() as any;
           throw new Error(errData.error || `HTTP ${response.status}`);
         }
-        const data = await response.json<Property>();
+        const data = await response.json() as Property;
         setProperty(data);
       } catch (err: any) {
         setError(err.message || 'Failed to load property');

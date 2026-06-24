@@ -1,6 +1,6 @@
 import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import Layout from '../components/Layout';
-import { Invoice, Property, VendorContact } from '../workers/src/types'; 
+import { Invoice, Property, VendorContact } from '../src/types';
 
 interface InvoiceFormProps {
   initialData?: Partial<Invoice>; 
@@ -25,6 +25,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData = {}, onSubmit, i
   const [vendors, setVendors] = useState<VendorContact[]>([]);
   const [fetchLoading, setFetchLoading] = useState<boolean>(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch properties and vendors when the component mounts
   useEffect(() => {
@@ -34,7 +35,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData = {}, onSubmit, i
       try {
         const propResponse = await fetch('/api/properties'); 
         if (!propResponse.ok) throw new Error('Failed to fetch properties');
-        const propData = await propResponse.json<Property[]>();
+        const propData = await propResponse.json() as Property[];
         setProperties(propData);
 
         const vendorResponse = await fetch('/api/vendors'); // Assumes /api/vendors endpoint is available in workers/src/api/vendors.ts
@@ -148,7 +149,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData = {}, onSubmit, i
         throw new Error('Failed to get upload URL');
       }
 
-      const { uploadUrl, fileKey } = await presignedUrlResponse.json<{ uploadUrl: string; fileKey: string }>();
+      const { uploadUrl, fileKey } = await presignedUrlResponse.json() as { uploadUrl: string; fileKey: string };
 
       setUploadStatus(`Uploading ${selectedFile.name}...`);
       
@@ -183,7 +184,6 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData = {}, onSubmit, i
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     // Basic validation for core invoice fields
-    if (!name.trim()) { alert('Property name is required.'); return; } // Typo: should be related to invoice
     if (!propertyId) { alert('Property selection is required.'); return; }
     if (!vendorId) { alert('Vendor selection is required.'); return; }
     if (!amount || amount <= 0) { alert('Valid amount is required.'); return; }
@@ -198,7 +198,8 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData = {}, onSubmit, i
       currency: currency,
       due_date: dueDate,
       description: description.trim(),
-      status: initialData.status || 'pending', 
+      status: initialData.status || 'pending',
+      updated_at: initialData.updated_at ?? null,
       // doc_url will be updated after successful file upload
     });
   };

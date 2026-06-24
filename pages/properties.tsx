@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import PropertyCard from '../components/PropertyCard';
-import { Property } from '../types'; // Assuming types are shared or accessible
+import { Property } from '../src/types';
 
 const PropertiesPage = () => {
   const [properties, setProperties] = useState<Property[]>([]);
@@ -18,7 +18,7 @@ const PropertiesPage = () => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json<Property[]>();
+        const data = await response.json() as Property[];
         setProperties(data);
       } catch (err: any) {
         setError(err.message || 'Failed to fetch properties');

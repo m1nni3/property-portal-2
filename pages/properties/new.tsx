@@ -21,7 +21,7 @@ const NewPropertyPage = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json<{ error: string }>();
+        const errorData = await response.json() as { error: string };
         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 
